@@ -75,4 +75,4 @@ EXECUTING COMMAND: OFF
 Setting device OFF
 CMD: 0a01, data: 00, SEQ: 02, SUM: 28
 RAW data: aa0afc3a86000a010002280d EOF datalen: 1
-111
+```
