@@ -27,13 +27,13 @@
 #include "hackoort.h"
 
 hackoortContext context = {
-    NULL,
-    1,
-    1,
-    0,
-    0,
-    "84:eb:18:7d:f8:4f",
-    "D000000"
+    NULL, // connection
+    0, // seq
+    1, // verbose
+    0, // force
+    0, // dry run
+    "84:eb:18:7d:f8:4f", // bt_address
+    "D000000" // password
 };
 
 char *command=NULL, **arguments=NULL;
@@ -48,6 +48,7 @@ static void usage() {
 	printf("  OFF                   Turn the OORT device OFF\n");
 	printf("  BRIGHTNESS pct	Set the OORT bulb brightness to 'pct' percents\n");
 	printf("  RGB rrggbb            Set the OORT bulb color to 'rrggbb'\n");
+	printf("  STATUS                Read device status\n");
 	printf("\n");
 	printf("Options:\n"
 	"  -d, --devide_address ADDR    OORT Device address\n"
@@ -118,7 +119,6 @@ char* read_hex_data(char* str,unsigned char len)
 
 int parse_command(int argc, char** argv)
 {
-	static unsigned short prime=0;
 	unsigned short args=0; // number of arguments for current command including command
 
 	if (context.verbose >2) printf("EXECUTING COMMAND: %s\n", command);
@@ -134,7 +134,7 @@ int parse_command(int argc, char** argv)
 	else if (strcmp(command, "RGB") == 0) {
 		args++;
 		char* rgb=read_hex_data(arguments[0],3);
-		hackoort_set_rgb(&context,rgb[2],rgb[1],rgb[1]);
+		hackoort_set_rgb(&context,rgb[2],rgb[1],rgb[0]);
 		free(rgb);
 	}
 	else if (strcmp(command, "RAW") == 0) {
@@ -144,12 +144,16 @@ int parse_command(int argc, char** argv)
 		args+=2;
 		aa0afc3a8600(&context, cmd, data, len);
 		free(cmd);free(data);
-		}
-	if (!prime) { 
-		prime=1;
-		if (context.verbose) printf("BUG WORKAROUND, repeating first command\n");
-		parse_command(argc,argv);
 	}
+	else if (strcmp(command, "STATUS") == 0) {
+	    unsigned char* ret=hackoort_read_characteristic(&context);
+	    int i;
+	    printf("Characteristic ");
+	    for (i = 0; i < 5; i++)
+	    	printf("%02x ", ret[i]);
+	    printf("\n");
+	}
+
 	optind+=args;
 	// Execute next command in line if any
 	if (optind<argc) {

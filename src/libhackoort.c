@@ -43,19 +43,13 @@ int hackoort_check_lock_status(hackoortContext* context)
 
 char* hackoort_read_characteristic(hackoortContext *context)
 {
-	int i,len;
-	static unsigned char ret[5];
+	int len;
+	static unsigned char ret[5]="\x00\x00\x00\x00\x00";
 	static bt_uuid_t g_uuid;
 
 	/* read pass status, handle 0x2a */
 	bt_string_to_uuid(&g_uuid, "a8b3fff2-4834-4051-89d0-3de95cddd318");
 	len = gattlib_read_char_by_uuid(context->connection, &g_uuid, &ret, sizeof(ret));
-	if (context->verbose) {
-		printf("Characteristic ");
-		for (i = 0; i < len; i++)
-			printf("%02x ", ret[i]);
-		printf("\n");
-	}
 	return ret;
 }
 
@@ -88,7 +82,7 @@ int aa0afc3a8600(hackoortContext* context, hackoort_cmd cmd, char* data, int dat
 	if (context->verbose>3) {
 	    printf("RAW data: ");
 	    for (j=0;j<i;j++) 
-			printf("%02x", buffer[j]);
+		printf("%02x", buffer[j]);
 	    printf(" EOF datalen: %u\n",datalen);
 	}
 
@@ -97,6 +91,12 @@ int aa0afc3a8600(hackoortContext* context, hackoort_cmd cmd, char* data, int dat
 	if (!context->dry_run) {
 	    ret = gattlib_write_char_by_handle(context->connection, 0x21, buffer, i);
 	    assert(ret == 0);
+	}
+	if (!context->seq) {
+	    if (context->verbose) printf("BUG WORKAROUND, repeating first command\n");
+	    context->seq++;
+	    aa0afc3a8600(context, cmd, data, datalen);
+	    context->seq--;
 	}
 	context->seq++;
 
