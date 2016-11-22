@@ -130,5 +130,8 @@ int hackoort_set_rgb(hackoortContext* context, char r, char g, char b)
     data[1]=r;
     data[2]=g;
     data[3]=b;
+    if (context->verbose) {
+	printf("Setting RGB to %02x%02x%02x\n",r,g,b);
+    }
     return aa0afc3a8600(context, "\x0d\x06", (void*) data, 6);
 }
