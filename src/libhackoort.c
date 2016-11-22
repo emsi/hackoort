@@ -123,4 +123,12 @@ int hackoort_set_luminance_pct(hackoortContext* context, unsigned char pct)
     return hackoort_set_luminance(context, lum);
 }
 
-
+int hackoort_set_rgb(hackoortContext* context, char r, char g, char b)
+{
+    char data[6]="\x00\x00\x00\x00\x00\x00";
+    data[0]=1; // RGB mode
+    data[1]=r;
+    data[2]=g;
+    data[3]=b;
+    return aa0afc3a8600(context, "\x0d\x06", (void*) data, 6);
+}
