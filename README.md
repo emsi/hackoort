@@ -24,8 +24,11 @@ USAGE: hackoort [OPTION] COMMAND [command arguments]
 Commands:
   ON                    Turn the OORT device ON
   OFF                   Turn the OORT device OFF
-  BRIGHTNESS pct	Set the OORT bulb brightness to 'pct' percents
+  BRIGHTNESS pct        Set the OORT bulb brightness to 'pct' percents
+  TEMPERATURE pct       Set the OORT bulb relative temperature to 'pct' percents
   RGB rrggbb            Set the OORT bulb color to 'rrggbb'
+  RGB ON/OFF            Set the OORT bulb color mode ON/OFF
+  STATUS                Read device status
 
 Options:
   -d, --devide_address ADDR    OORT Device address
@@ -47,11 +50,11 @@ Setting device ON
 ```
 Set the luminance to 30% and be quiet
 ```
-$ ./oorttool/oorttool -v 0 -d 84:eb:18:7d:f8:4f LUMINANCE 30
+$ ./oorttool/oorttool -v 0 -d 84:eb:18:7d:f8:4f BRIGHTNESS 30
 ```
 You can chain multiple commands:
 ```
- ./oorttool/oorttool  -d 84:eb:18:7d:f8:4f ON LUMINANCE 90 RGB 22FFEE
+ ./oorttool/oorttool  -d 84:eb:18:7d:f8:4f ON BRIGHTNESS 90 RGB 22FFEE
 Unlocked: 00
 Unlocked: 01
 Setting device ON

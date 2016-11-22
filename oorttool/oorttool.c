@@ -46,7 +46,8 @@ static void usage() {
 	printf("Commands:\n");
 	printf("  ON                    Turn the OORT device ON\n");
 	printf("  OFF                   Turn the OORT device OFF\n");
-	printf("  BRIGHTNESS pct	Set the OORT bulb brightness to 'pct' percents\n");
+	printf("  BRIGHTNESS pct        Set the OORT bulb brightness to 'pct' percents\n");
+	printf("  TEMPERATURE pct       Set the OORT bulb relative temperature to 'pct' percents\n");
 	printf("  RGB rrggbb            Set the OORT bulb color to 'rrggbb'\n");
 	printf("  RGB ON/OFF            Set the OORT bulb color mode ON/OFF\n");
 	printf("  STATUS                Read device status\n");
@@ -128,9 +129,13 @@ int parse_command(int argc, char** argv)
 		hackoort_onoff(&context, 1);
 	else if (strcmp(command, "OFF") == 0)
 		hackoort_onoff(&context, 0);
-	else if (strcmp(command, "LUMINANCE") == 0) {
+	else if (!strcmp(command, "BRIGHTNESS")) {
 		args++;
-		hackoort_set_luminance_pct(&context, strtol(arguments[0],NULL,10));
+		hackoort_set_brightness_pct(&context, strtol(arguments[0],NULL,10));
+		}
+	else if (!strcmp(command, "TEMPERATURE")) {
+		args++;
+		hackoort_set_temperature_pct(&context, strtol(arguments[0],NULL,10));
 		}
 	else if (strcmp(command, "RGB") == 0) {
 		args++;
