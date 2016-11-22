@@ -135,3 +135,17 @@ int hackoort_set_rgb(hackoortContext* context, char r, char g, char b)
     }
     return aa0afc3a8600(context, "\x0d\x06", (void*) data, 6);
 }
+
+int hackoort_set_rgb_onoff(hackoortContext* context, unsigned on)
+{
+    char data[6]="\x00\x00\x00\x00\x00\x00";
+    unsigned char* characteristic=hackoort_read_characteristic(context);
+    data[0]=on?1:2; // RGB mode
+    data[1]=characteristic[2];
+    data[2]=characteristic[3];
+    data[3]=characteristic[4];
+    if (context->verbose) {
+	printf("Setting RGB %s, color %02x%02x%02x\n",on?"ON":"OFF",characteristic[2],characteristic[3],characteristic[4]);
+    }
+    return aa0afc3a8600(context, "\x0d\x06", (void*) data, 6);
+}

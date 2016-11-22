@@ -20,3 +20,4 @@ int hackoort_onoff(hackoortContext* context, unsigned char on);
 int hackoort_set_luminance(hackoortContext* context, unsigned char lum);
 int hackoort_set_luminance_pct(hackoortContext* context, unsigned char pct);
 int hackoort_set_rgb(hackoortContext* context, char r, char g, char b);
+int hackoort_set_rgb_onoff(hackoortContext* context, unsigned on);

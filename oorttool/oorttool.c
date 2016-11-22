@@ -48,6 +48,7 @@ static void usage() {
 	printf("  OFF                   Turn the OORT device OFF\n");
 	printf("  BRIGHTNESS pct	Set the OORT bulb brightness to 'pct' percents\n");
 	printf("  RGB rrggbb            Set the OORT bulb color to 'rrggbb'\n");
+	printf("  RGB ON/OFF            Set the OORT bulb color mode ON/OFF\n");
 	printf("  STATUS                Read device status\n");
 	printf("\n");
 	printf("Options:\n"
@@ -133,9 +134,18 @@ int parse_command(int argc, char** argv)
 		}
 	else if (strcmp(command, "RGB") == 0) {
 		args++;
-		char* rgb=read_hex_data(arguments[0],3);
-		hackoort_set_rgb(&context,rgb[2],rgb[1],rgb[0]);
-		free(rgb);
+		unsigned char on=0xff;
+		if (!strcmp(arguments[0],"ON"))
+		    on=1;
+		else if (!strcmp(arguments[0],"OFF"))
+		    on=0;
+		if (on!=0xff) {
+		    hackoort_set_rgb_onoff(&context,on);
+		} else {
+		    char* rgb=read_hex_data(arguments[0],3);
+		    hackoort_set_rgb(&context,rgb[2],rgb[1],rgb[0]);
+		    free(rgb);
+		}
 	}
 	else if (strcmp(command, "RAW") == 0) {
 		unsigned char len=strlen(arguments[1])/2;
