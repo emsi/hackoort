@@ -119,6 +119,26 @@ char* read_hex_data(char* str,unsigned char len)
     return buff;
 }
 
+void print_status(unsigned char* status) {
+    unsigned char on, brightness, temperature, rgbon, r, g, b;
+
+    on=status[0]&&1;
+    brightness=(status[1]&0xf0)>>4;
+    temperature=status[1]&0xf;
+    rgbon=(temperature==0);
+    r=status[2];
+    g=status[3];
+    b=status[4];
+    // convert brightness and luminance to %
+    brightness=(brightness-1)*10;
+    temperature=(temperature-1)*10;
+
+    printf("BULB IS %s BRIGHNESS %u\%% ",on?"ON":"OFF", brightness);
+    if (rgbon) printf ("COLOR %02x%02x%02x\n", r,g,b);
+    else printf ("TEMPERATURE %u\%\n", temperature);
+
+}
+
 int parse_command(int argc, char** argv)
 {
 	unsigned short args=0; // number of arguments for current command including command
@@ -133,9 +153,17 @@ int parse_command(int argc, char** argv)
 		args++;
 		hackoort_set_brightness_pct(&context, strtol(arguments[0],NULL,10));
 		}
+	else if (!strcmp(command, "B")) {
+		args++;
+		hackoort_set_brightness(&context, strtol(arguments[0],NULL,10));
+		}
 	else if (!strcmp(command, "TEMPERATURE")) {
 		args++;
 		hackoort_set_temperature_pct(&context, strtol(arguments[0],NULL,10));
+		}
+	else if (!strcmp(command, "T")) {
+		args++;
+		hackoort_set_temperature(&context, strtol(arguments[0],NULL,10));
 		}
 	else if (strcmp(command, "RGB") == 0) {
 		args++;
@@ -162,11 +190,14 @@ int parse_command(int argc, char** argv)
 	}
 	else if (strcmp(command, "STATUS") == 0) {
 	    unsigned char* ret=hackoort_read_characteristic(&context);
-	    int i;
-	    printf("Characteristic ");
-	    for (i = 0; i < 5; i++)
-	    	printf("%02x ", ret[i]);
-	    printf("\n");
+	    print_status(ret);
+	    if (context.verbose>1) {
+		int i;
+		printf("RAW Characteristic ");
+		for (i = 0; i < 5; i++)
+		   printf("%02x ", ret[i]);
+		printf("\n");
+	    }
 	}
 
 	optind+=args;

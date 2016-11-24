@@ -117,10 +117,21 @@ int hackoort_set_brightness(hackoortContext* context, unsigned char lum)
     return aa0afc3a8600(context, "\x0c\x01", (void*) &lum, 1);
 }
 
+/*
+ * brightness is in range 02 to 0b
+	   00 - means decrement by 1
+	   01 - means increment by 1
+	   02 - 10%
+           0b - 100%
+ */
+
 int hackoort_set_brightness_pct(hackoortContext* context, unsigned char pct)
 {
-    unsigned char lum=2+(9.0*(pct>100?100:pct)/100.0);
-    return hackoort_set_brightness(context, lum);
+
+    pct=pct>100?100:pct;
+    pct=pct<10?10:pct;
+    unsigned char bri=1+(pct/10.0);
+    return hackoort_set_brightness(context, bri);
 }
 
 int hackoort_set_temperature(hackoortContext* context, unsigned char lum)
@@ -131,8 +142,10 @@ int hackoort_set_temperature(hackoortContext* context, unsigned char lum)
 
 int hackoort_set_temperature_pct(hackoortContext* context, unsigned char pct)
 {
-    unsigned char lum=2+(9.0*(pct>100?100:pct)/100.0);
-    return hackoort_set_temperature(context, lum);
+    pct=pct>100?100:pct;
+    pct=pct<10?10:pct;
+    unsigned char temp=1+(pct/10.0);
+    return hackoort_set_temperature(context, temp);
 }
 
 int hackoort_set_rgb(hackoortContext* context, char r, char g, char b)
