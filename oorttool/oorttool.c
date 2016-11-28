@@ -22,9 +22,12 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <endian.h>
+#include <glib.h>
 
 #include "gattlib.h"
 #include "hackoort.h"
+
+const char* CONFIG_FILE=".oorttool.conf";
 
 hackoortContext context = {
     NULL, // connection
@@ -36,10 +39,62 @@ hackoortContext context = {
     "D000000" // password
 };
 
+typedef struct {
+    char* name;
+    char* bt_address;
+    char* password;
+    char* description;
+} Devices;
+
+Devices** devices=NULL;
+
 char *command=NULL, **arguments=NULL;
 unsigned short arguments_count=0;
 
 typedef char hackoort_cmd[2];
+
+int read_config() {
+    GKeyFile* gkf;
+    GError *error = NULL;
+    gchar **groups;
+    gsize glen=0;
+
+    char *path;
+
+    path = g_build_filename (g_get_home_dir (), CONFIG_FILE, NULL);
+
+    gkf = g_key_file_new();
+    if (!g_key_file_load_from_file(gkf, path, G_KEY_FILE_NONE, &error)){
+	fprintf (stderr, "Could not read config file %s\n", CONFIG_FILE);
+	g_error (error->message);
+	g_free (path);
+	return EXIT_FAILURE;
+    }
+
+    groups=g_key_file_get_groups(gkf, &glen);
+    if (context.verbose>3) {
+	printf("Parsign config %s\n", path);
+	printf("  devices: %i\n",glen);
+    }
+    if (glen) {
+	devices=calloc(glen,sizeof(Devices*));
+	int i=0;
+	for (;i<glen;i++) {
+	    devices[i] = g_slice_new (Devices);
+	    devices[i]->name=groups[i];
+	    devices[i]->bt_address=g_key_file_get_string(gkf, groups[i], "bt_address", NULL);
+	    devices[i]->password=g_key_file_get_string(gkf, groups[i], "password", NULL);
+	    devices[i]->description=g_key_file_get_string(gkf, groups[i], "description", NULL);
+	    if (context.verbose>3) {
+		printf ("  [%s]\n",groups[i]);
+		printf ("    %s: (%s) %s\n",devices[i]->bt_address, devices[i]->password, devices[i]->description);
+	    }
+	}
+    }
+    /* g_strfreev(groups); // we'll be using it */
+    g_free (path);
+    g_key_file_free (gkf);
+}
 
 static void usage() {
 	printf("USAGE: hackoort [OPTION] COMMAND [command arguments]\n\n");
@@ -81,6 +136,7 @@ int parse_opts(int argc, char **argv)
 			case 0:
 			    if (!(strcmp("dry-run", loptions[option_index].name)))
 				context.dry_run=1;
+			    break;
 			case 'f':
 				context.force=~context.force;
 				break;
@@ -89,7 +145,7 @@ int parse_opts(int argc, char **argv)
 					context.verbose=strtol(optarg,NULL,10);
 				else
 					context.verbose=1;
-				/*printf("VERBOSE LEVEL  = %i\n",context.verbose);*/
+				//printf("VERBOSE LEVEL  = %i\n",context.verbose);
 				break;
 			case 'h':
 				usage();
@@ -103,7 +159,7 @@ int parse_opts(int argc, char **argv)
 		arguments=&(argv[optind]);
 		arguments_count=argc-optind;
 	}
-	if (context.verbose>3) printf("CMD: %s, arg[last]: %s, argc: %i\n", command, arguments[arguments_count-1], arguments_count);
+	if (command && context.verbose>3) printf("CMD: %s, arg[last]: %s, argc: %i\n", command, arguments[arguments_count-1], arguments_count);
 }			
 
 // Take string input like 0x1222 or 0a0406 and return bufer with bytes of such value
@@ -218,8 +274,11 @@ int main(int argc, char *argv[]) {
 	int i, len, ret;
 	static bt_uuid_t g_uuid;
 
-
 	parse_opts(argc,argv);
+
+	read_config();
+
+	if (!command) goto out;
 
 	context.connection = gattlib_connect(NULL, context.bt_address, BDADDR_LE_PUBLIC, BT_IO_SEC_LOW, 0, 0);
 	if (context.connection == NULL) {
@@ -228,17 +287,18 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* read pass status */
-	hackoort_check_lock_status(&context);
+	// hackoort_check_lock_status(&context);
 
-	// char-write-req 27 44303030303030
+	// char-write-req 27 44303030303030  - unlock device 
 	ret = gattlib_write_char_by_handle(context.connection, 0x27, context.password, strlen(context.password));
 	assert(ret == 0);
 
 	/* read pass status */
 	hackoort_check_lock_status(&context);
 	
-	parse_command(argc, argv);
+	if (command) parse_command(argc, argv);
 
 	gattlib_disconnect(context.connection);
+out:
 	return 0;
 }
