@@ -34,7 +34,7 @@ int hackoort_check_lock_status(hackoortContext* context)
 	/* read pass status, handle 0x2a */
 	bt_string_to_uuid(&g_uuid, "a8b3fff4-4834-4051-89d0-3de95cddd318"); 
 	len = gattlib_read_char_by_uuid(context->connection, &g_uuid, &ret, sizeof(ret));
-	if (context->verbose) printf("Unlocked: %02x\n", ret);
+	if (context->verbose>1) printf("Device is %s\n", ret?"UNLOCKED":"LOCKED");
 	return ret;
 }
 
