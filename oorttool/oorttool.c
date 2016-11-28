@@ -66,7 +66,7 @@ int read_config() {
     gkf = g_key_file_new();
     if (!g_key_file_load_from_file(gkf, path, G_KEY_FILE_NONE, &error)){
 	fprintf (stderr, "Could not read config file %s\n", CONFIG_FILE);
-	g_error (error->message);
+	//g_error (error->message);
 	g_free (path);
 	return EXIT_FAILURE;
     }
@@ -85,6 +85,12 @@ int read_config() {
 	    devices[i]->bt_address=g_key_file_get_string(gkf, groups[i], "bt_address", NULL);
 	    devices[i]->password=g_key_file_get_string(gkf, groups[i], "password", NULL);
 	    devices[i]->description=g_key_file_get_string(gkf, groups[i], "description", NULL);
+
+	    /* set global context if device name matches the device in config */
+	    if (!strcmp(groups[i],context.bt_address)) {
+		context.bt_address=devices[i]->bt_address;
+		context.password=devices[i]->password;
+		}
 	    if (context.verbose>3) {
 		printf ("  [%s]\n",groups[i]);
 		printf ("    %s: (%s) %s\n",devices[i]->bt_address, devices[i]->password, devices[i]->description);
@@ -109,6 +115,7 @@ static void usage() {
 	printf("\n");
 	printf("Options:\n"
 	"  -d, --devide_address ADDR    OORT Device address\n"
+	"  -d, --devide NAME            OORT Device name (from config file)\n"
 	"  -p, --password PASSWOD       Unlock the OORT device using PASSWORD\n"
 	"                               \n"
 	"  -f, --force                  Try to force operation\n"
@@ -125,6 +132,7 @@ int parse_opts(int argc, char **argv)
 	static struct option loptions[] = {
 		{"help",0,0,'h'},
 		{"device_address",1,0,'d'},
+		{"device",1,0,'d'},
 		{"password",1,0,'p'},
 		{"force",0,0,'f'},
 		{"verbose",2,0,'v'},
@@ -146,6 +154,9 @@ int parse_opts(int argc, char **argv)
 				else
 					context.verbose=1;
 				//printf("VERBOSE LEVEL  = %i\n",context.verbose);
+				break;
+			case 'd':
+				context.bt_address=strdup(optarg);
 				break;
 			case 'h':
 				usage();
@@ -280,9 +291,11 @@ int main(int argc, char *argv[]) {
 
 	if (!command) goto out;
 
+	if (context.verbose>1) 
+	    printf("Connecting to %s\n",context.bt_address);
 	context.connection = gattlib_connect(NULL, context.bt_address, BDADDR_LE_PUBLIC, BT_IO_SEC_LOW, 0, 0);
 	if (context.connection == NULL) {
-		fprintf(stderr, "Fail to connect to the bluetooth device.\n");
+		fprintf(stderr, "Failed to connect to the bluetooth device %s.\n", context.bt_address);
 		return 1;
 	}
 
@@ -290,8 +303,11 @@ int main(int argc, char *argv[]) {
 	// hackoort_check_lock_status(&context);
 
 	// char-write-req 27 44303030303030  - unlock device 
+	if (!context.password) {
+	    context.password="D000000";
+	}
 	ret = gattlib_write_char_by_handle(context.connection, 0x27, context.password, strlen(context.password));
-	assert(ret == 0);
+        assert(ret == 0);
 
 	/* read pass status */
 	hackoort_check_lock_status(&context);
