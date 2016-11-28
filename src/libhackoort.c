@@ -18,9 +18,6 @@
  */
 
 #include <assert.h>
-//#include <stdio.h>
-//#include <getopt.h>
-//#include <stdlib.h>
 #include <endian.h>
 
 #include "gattlib.h"
