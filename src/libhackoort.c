@@ -27,26 +27,28 @@ typedef char hackoort_cmd[2];
 
 int hackoort_check_lock_status(hackoortContext* context)
 {
-	int len;
 	unsigned char ret;
-	static bt_uuid_t g_uuid;
+	size_t len=sizeof(ret);
+	static uuid_t g_uuid;
 
 	/* read pass status, handle 0x2a */
-	bt_string_to_uuid(&g_uuid, "a8b3fff4-4834-4051-89d0-3de95cddd318"); 
-	len = gattlib_read_char_by_uuid(context->connection, &g_uuid, &ret, sizeof(ret));
+	// bt_string_to_uuid(&g_uuid, "a8b3fff4-4834-4051-89d0-3de95cddd318");  // 42
+	gattlib_string_to_uuid("a8b3fff4-4834-4051-89d0-3de95cddd318", 37, &g_uuid);
+	gattlib_read_char_by_uuid(context->connection, &g_uuid, &ret, &len);
 	if (context->verbose>1) printf("Device is %s\n", ret?"UNLOCKED":"LOCKED");
 	return ret;
 }
 
 char* hackoort_read_characteristic(hackoortContext *context)
 {
-	int len;
 	static unsigned char ret[5]="\x00\x00\x00\x00\x00";
-	static bt_uuid_t g_uuid;
+	size_t len=sizeof(ret);
+	static uuid_t g_uuid;
 
 	/* read pass status, handle 0x2a */
-	bt_string_to_uuid(&g_uuid, "a8b3fff2-4834-4051-89d0-3de95cddd318");
-	len = gattlib_read_char_by_uuid(context->connection, &g_uuid, &ret, sizeof(ret));
+	// bt_string_to_uuid(&g_uuid, "a8b3fff2-4834-4051-89d0-3de95cddd318"); // 35
+	gattlib_string_to_uuid("a8b3fff2-4834-4051-89d0-3de95cddd318", 37, &g_uuid);
+	gattlib_read_char_by_uuid(context->connection, &g_uuid, &ret, &len);
 	return ret;
 }
 

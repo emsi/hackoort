@@ -283,7 +283,7 @@ int parse_command(int argc, char** argv)
 int main(int argc, char *argv[]) {
 	uint8_t buffer[100];
 	int i, len, ret;
-	static bt_uuid_t g_uuid;
+	static uuid_t g_uuid;
 
 	parse_opts(argc,argv);
 
@@ -293,11 +293,13 @@ int main(int argc, char *argv[]) {
 
 	if (context.verbose>1) 
 	    printf("Connecting to %s\n",context.bt_address);
-	context.connection = gattlib_connect(NULL, context.bt_address, BDADDR_LE_PUBLIC, BT_IO_SEC_LOW, 0, 0);
+	context.connection = gattlib_connect(NULL, context.bt_address, BDADDR_LE_PUBLIC, BT_SEC_LOW, 0, 0);
 	if (context.connection == NULL) {
 		fprintf(stderr, "Failed to connect to the bluetooth device %s.\n", context.bt_address);
 		return 1;
 	}
+	if (context.verbose>2) 
+	    printf("Connected to %s\n",context.bt_address);
 
 	/* read pass status */
 	// hackoort_check_lock_status(&context);
