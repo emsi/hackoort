@@ -1,7 +1,7 @@
 # hackoort
 Tool and library to interact with OORT Light bulbs
 
-PREREQUISITES
+Prerequisites
 =============
 Od Dbian/Ubuntu based systems (including raspberry pi)
 ```
