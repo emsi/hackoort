@@ -45,12 +45,29 @@ Commands:
 
 Options:
   -d, --devide_address ADDR    OORT Device address
+  -d, --devide NAME            OORT Device name (from config file)
   -p, --password PASSWOD       Unlock the OORT device using PASSWORD
-
+                               
   -f, --force                  Try to force operation
   -v, --verbose LEVEL          Be verbose (print more debug)
   --dry-run                    Dry run (do not communicat eover BT)
   -h, --help                   Print this help message
+```
+Make config file to call device by name:
+```
+cat >> ~/.oorttool.conf << EOF
+[desk]
+bt_address=84:EB:18:7D:F8:4F
+[kitchen]
+bt_address=84:EB:18:7D:F8:61
+password=qpqp01
+description=Kitchen bulb
+EOF
+```
+Check bulb status
+```
+./oorttool/oorttool -d kitchen STATUS
+BULB IS ON BRIGHNESS 100% TEMPERATURE 100%
 ```
 Turn on the bulb
 ```
