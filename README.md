@@ -1,6 +1,19 @@
 # hackoort
 Tool and library to interact with OORT Light bulbs
 
+Prerequisites
+=============
+Od Dbian/Ubuntu based systems (including raspberry pi)
+```
+apt-get install build-essential cmake libbluetooth-dev libreadline-dev libglib2.0-dev
+git clone https://github.com/labapart/gattlib
+cd gattlib
+mkdir build && cd build
+cmake ..
+make
+cpack -G DEB ..
+sudo dpkg -i ./gattlib_0.2_armv7l.deb 
+```
 
 Build Hackoort
 =============
