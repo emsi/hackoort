@@ -5,4 +5,3 @@ set(oorttool_SRCS oorttool.c)
 # oorttool
 add_executable(oorttool ${oorttool_SRCS})
 target_link_libraries(oorttool ${hackoor_LIBS} hackoort)
-

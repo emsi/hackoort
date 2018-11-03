@@ -29,6 +29,7 @@ struct _hackoortContext {
     char* bt_address;  // remote device address
     char* password; // default password used when no password is set
     void* context; // pointer to be passed around
+    char* name; // remote device descriptive name
 };
 
 

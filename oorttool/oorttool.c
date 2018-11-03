@@ -36,7 +36,8 @@ hackoortContext context = {
     0, // force
     0, // dry run
     "84:eb:18:7d:f8:4f", // bt_address
-    "D000000" // password
+    "D000000", // password
+    NULL
 };
 
 typedef struct {
@@ -90,6 +91,7 @@ int read_config() {
 	    if (!strcmp(groups[i],context.bt_address)) {
 		context.bt_address=devices[i]->bt_address;
 		context.password=devices[i]->password;
+		context.name=groups[i];
 		}
 	    if (context.verbose>3) {
 		printf ("  [%s]\n",groups[i]);
@@ -114,8 +116,8 @@ static void usage() {
 	printf("  STATUS                Read device status\n");
 	printf("\n");
 	printf("Options:\n"
-	"  -d, --devide_address ADDR    OORT Device address\n"
-	"  -d, --devide NAME            OORT Device name (from config file)\n"
+	"  -d, --device_address ADDR    OORT Device address\n"
+	"  -d, --device NAME            OORT Device name (from config file)\n"
 	"  -p, --password PASSWOD       Unlock the OORT device using PASSWORD\n"
 	"                               \n"
 	"  -f, --force                  Try to force operation\n"
@@ -200,9 +202,9 @@ void print_status(unsigned char* status) {
     brightness=(brightness-1)*10;
     temperature=(temperature-1)*10;
 
-    printf("BULB IS %s BRIGHNESS %u\%% ",on?"ON":"OFF", brightness);
-    if (rgbon) printf ("COLOR %02x%02x%02x\n", r,g,b);
-    else printf ("TEMPERATURE %u\%\n", temperature);
+    printf("The BULB %s is %s. BRIGHNESS %u\%%. ",context.name, on?"ON":"OFF", brightness);
+    if (rgbon) printf ("COLOR %02x%02x%02x.\n", r,g,b);
+    else printf ("TEMPERATURE %u\%%.\n", temperature);
 
 }
 
