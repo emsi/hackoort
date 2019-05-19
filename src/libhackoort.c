@@ -52,6 +52,25 @@ char* hackoort_read_characteristic(hackoortContext *context)
 	return ret;
 }
 
+bulbStatus hackoort_get_characteristics(hackoortContext *context)
+{
+	bulbStatus status;
+	unsigned char* characteristics = hackoort_read_characteristic(context);
+
+	status.on = characteristics[0]&&1;
+	status.brightness=(characteristics[1]&0xf0)>>4;
+	status.temperature=characteristics[1]&0xf;
+	status.rgbon=(status.temperature==0);
+	status.red=characteristics[2];
+	status.green=characteristics[3];
+	status.blue=characteristics[4];
+	// convert brightness and luminance to %
+	status.brightness=(status.brightness-1)*10;
+	status.temperature=(status.temperature-1)*10;
+
+	return status;
+}
+
 int aa0afc3a8600(hackoortContext* context, hackoort_cmd cmd, char* data, int datalen)
 {
 	unsigned char buffer[]="\xaa\x0a\xfc\x3a\x86\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";

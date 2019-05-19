@@ -32,6 +32,17 @@ struct _hackoortContext {
     char* name; // remote device descriptive name
 };
 
+typedef struct _bulbStatus bulbStatus;
+struct _bulbStatus {
+    unsigned char on;
+    unsigned char brightness;
+    unsigned char temperature;
+    unsigned char rgbon;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+};
+
 
 // Hackoort functions 
 int hackoort_check_lock_status(hackoortContext* context);
@@ -46,4 +57,5 @@ int hackoort_set_temperature_pct(hackoortContext* context, unsigned char pct);
 int hackoort_set_rgb(hackoortContext* context, char r, char g, char b);
 int hackoort_set_rgb_onoff(hackoortContext* context, unsigned on);
 
+bulbStatus hackoort_get_characteristics(hackoortContext *context);
 #endif /* __LIBOORT_H__ */
