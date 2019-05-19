@@ -109,3 +109,28 @@ Setting device OFF
 CMD: 0a01, data: 00, SEQ: 02, SUM: 28
 RAW data: aa0afc3a86000a010002280d EOF datalen: 1
 ```
+
+Python bindings
+==============
+Requires bleeding edge (just c.a. 6 hours old at the time of writing!) python gattlib bindings.
+Just checkout from
+https://github.com/labapart/gattlib/tree/initial-python-support
+(you may expect things to break).
+
+DO NOT ~~pip install gattlib~~!!!
+
+Just checkout gattlib and hackoort and set `PYTHONPATH` like:
+```
+export PYTHONPATH=/home/emsi/git/hackoort/python/:/home/emsi/git/gattlib/gattlib-py/
+```
+
+Interacting with bulb should be as simple as:
+```
+>>> from hackoort.bulb import Bulb
+>>> b = Bulb(bt_address='84:EB:18:7D:F8:61'.encode()).connect()
+>>> b.on()
+>>> b.off()
+>>> b.set_brightness_pct(100)
+>>> b.set_rgb(255,30,50)
+>>> b.disconnect()
+```
