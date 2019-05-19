@@ -1,0 +1,2 @@
+class OortException(Exception):
+    pass
