@@ -75,7 +75,7 @@ int read_config() {
     groups=g_key_file_get_groups(gkf, &glen);
     if (context.verbose>3) {
 	printf("Parsign config %s\n", path);
-	printf("  devices: %i\n",glen);
+	printf("  devices: %li\n",glen);
     }
     if (glen) {
 	devices=calloc(glen,sizeof(Devices*));
@@ -180,9 +180,9 @@ char* read_hex_data(char* str,unsigned char len)
 {
     static uint64_t num;
     long unsigned l=0;
-    l=sscanf(str, "%12llx", &num);
+    l=sscanf(str, "%12lx", &num);
     num=htole64(num);
-    if (context.verbose>4) printf("HEX: 0x%llx l: %lx \n", num, l);
+    if (context.verbose>4) printf("HEX: 0x%lx l: %lx \n", num, l);
     char* const buff = (char*)malloc(len);
     memcpy(buff,&num,len);
     return buff;
