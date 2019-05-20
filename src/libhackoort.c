@@ -17,7 +17,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <assert.h>
 #include <endian.h>
 
 #include "gattlib.h"
@@ -108,16 +107,19 @@ int aa0afc3a8600(hackoortContext* context, hackoort_cmd cmd, char* data, int dat
 	/* handle 0x21 */
 	if (!context->dry_run) {
 	    ret = gattlib_write_char_by_handle(context->connection, 0x21, buffer, i);
-	    assert(ret == 0);
-	}
-	if (!context->seq) {
-	    if (context->verbose) printf("BUG WORKAROUND, repeating first command\n");
-	    context->seq++;
-	    aa0afc3a8600(context, cmd, data, datalen);
-	    context->seq--;
+		if (ret != 0){
+			if (context->verbose) {
+				printf("ERROR communicating with device\n");
+			}
+			return ret;
+		}
 	}
 	context->seq++;
-
+	/* bug workaround */
+	if (context->seq==1) {
+	    if (context->verbose) printf("BUG WORKAROUND, repeating first command\n");
+	    ret = aa0afc3a8600(context, cmd, data, datalen);
+	}
 	return ret;
 }
 
