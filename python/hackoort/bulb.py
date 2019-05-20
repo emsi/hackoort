@@ -8,6 +8,10 @@ from hackoort import (
 from hackoort.errors import OortException
 
 
+def _checkzero(zero):
+    if zero != 0:
+        raise OortException("Error comunicating with device")
+
 class Bulb:
     def __init__(self, bt_address, password=b'D000000', verbose=1):
         self.bt_address = bt_address
@@ -40,43 +44,43 @@ class Bulb:
         return self
 
     def onoff(self, on):
-        onoff(self.context, on)
+        _checkzero(onoff(self.context, on))
         return self
 
     def on(self):
-        self.onoff(1)
+        return self.onoff(1)
 
     def off(self):
-        self.onoff(0)
+        return self.onoff(0)
 
     def bw(self):
-        self.set_rgb_onoff(0)
+        return self.set_rgb_onoff(0)
 
     def color(self):
-        self.set_rgb_onoff(1)
+        return self.set_rgb_onoff(1)
 
     def set_brightness(self, brightness):
-        set_brightness(self.context, brightness)
+        _checkzero(set_brightness(self.context, brightness))
         return self
 
     def set_brightness_pct(self, percent):
-        set_brightness_pct(self.context, percent)
+        _checkzero(set_brightness_pct(self.context, percent))
         return self
 
     def set_temperature(self, temperature):
-        set_temperature(self.context, temperature)
+        _checkzero(set_temperature(self.context, temperature))
         return self
 
     def set_temperature_pct(self, percent):
-        set_temperature_pct(self.context, percent)
+        _checkzero(set_temperature_pct(self.context, percent))
         return self
 
     def set_rgb(self, red, green, blue):
-        set_rgb(self.context, red, green, blue)
+        _checkzero(set_rgb(self.context, red, green, blue))
         return self
 
     def set_rgb_onoff(self, on):
-        set_rgb_onoff(self.context, on)
+        _checkzero(set_rgb_onoff(self.context, on))
         return self
 
     def get_status(self):
