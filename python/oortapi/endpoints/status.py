@@ -18,10 +18,11 @@ class Brightness(Resource):
             status = bulb.get_status()
             return status.brightness
 
-        if lum <=0 or lum >100:
-            raise BulbError
-        print(bulb.status.on)
+        if lum <= 0 or lum  > 100:
+            return 0
+
         if not bulb.status.on:
             bulb.on()
+
         bulb.set_brightness_pct(lum)
         return lum
