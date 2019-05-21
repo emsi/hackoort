@@ -6,4 +6,4 @@ set(oorttool_SRCS oorttool.c)
 add_executable(oorttool ${oorttool_SRCS})
 target_link_libraries(oorttool ${hackoor_LIBS} hackoort)
 
-install(FILES oorttool DESTINATION bin)
+install(TARGETS oorttool DESTINATION bin)
