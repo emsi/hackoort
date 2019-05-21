@@ -1,0 +1,4 @@
+argcomplete
+gunicorn
+flask
+flask_restful
