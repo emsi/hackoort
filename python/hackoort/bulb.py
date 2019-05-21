@@ -1,7 +1,6 @@
 from gattlib import gattlib
-
 from hackoort import (
-    HackoortContext, check_lock_status, get_characteristics, onoff,
+    BulbStatus, HackoortContext, check_lock_status, get_characteristics, onoff,
     set_brightness, set_brightness_pct, set_rgb, set_rgb_onoff, set_temperature,
     set_temperature_pct, unlock,
 )
@@ -12,6 +11,7 @@ def _checkzero(zero):
     if zero != 0:
         raise OortException("Error comunicating with device")
 
+
 class Bulb:
     def __init__(self, bt_address, password=b'D000000', verbose=1):
         self.bt_address = bt_address
@@ -19,6 +19,7 @@ class Bulb:
             seq=0, verbose=verbose, force=0, dry_run=0, password=password
         )
         self.connection = None
+        self.status = None
 
     def _check_connection(self):
         if self.connection is None:
@@ -37,6 +38,7 @@ class Bulb:
         if not check_lock_status(self.context):
             raise OortException("Wrong bulb password")
 
+        self.get_status()
         return self
 
     def disconnect(self):
@@ -45,6 +47,7 @@ class Bulb:
 
     def onoff(self, on):
         _checkzero(onoff(self.context, on))
+        self.status.on = on
         return self
 
     def on(self):
@@ -83,5 +86,6 @@ class Bulb:
         _checkzero(set_rgb_onoff(self.context, on))
         return self
 
-    def get_status(self):
-        return get_characteristics(self.context)
+    def get_status(self) -> BulbStatus:
+        self.status = get_characteristics(self.context)
+        return self.status
