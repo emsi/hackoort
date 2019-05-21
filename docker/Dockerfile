@@ -25,12 +25,12 @@ RUN cd /usr/local/src && \
     cd gattlib && git checkout initial-python-support && \
     mkdir build && cd build && \
     cmake .. && make && make install && \
-    ln -sf /usr/local/src/gattlib/gattlib-py/gattlib /hackoort
+    cp -al /usr/local/src/gattlib/gattlib-py/gattlib /hackoort
 RUN cd /usr/local/src && \
     git clone https://github.com/emsi/hackoort && \
     cd hackoort && mkdir build && cd build && \
     cmake .. && make && make install && \
-    ln -sf /usr/local/src/hackoort/python/hackoort /hackoort && \
+    cp -al /usr/local/src/hackoort/python/hackoort /hackoort && \
     ldconfig
 
 RUN pip3 install --upgrade pip && \
