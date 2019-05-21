@@ -20,5 +20,6 @@ services:
       published: 5011
       protocol: tcp
     volumes:
-      - ../:/hackoort
+      - ../python/hackoort:/hackoort/hackoort
+      - ../python/oortapi:/hackoort/oortapi
     network_mode: "host"

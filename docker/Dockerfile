@@ -12,7 +12,7 @@ RUN apt-get install -y --no-install-recommends \
         ca-certificates \
         libbluetooth-dev libreadline-dev
 RUN apt-get install -y --no-install-recommends \
-    pkg-config libglib2.0-dev dbus bluez python3-pip
+    pkg-config libglib2.0-dev dbus bluez python3-pip python3-dev
 
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* \
@@ -50,4 +50,18 @@ ENV LC_COLLATE "C.UTF-8"
 # Project path
 ENV PYTHONPATH="${PYTHONPATH}:/hackoort"
 
+
+# For development we use remote ssh
+RUN sed -i \
+    -e 's/^Port 22/Port 1122/' \
+    /etc/ssh/sshd_config && \
+	mkdir /root/.ssh && chmod 700 /root/.ssh && mkdir /var/run/sshd
+COPY authorized_keys /root/.ssh
+EXPOSE 22
+RUN echo "export LANG=C.UTF-8" >> /etc/profile &&\
+    echo "export LC_COLLATE=C.UTF-8" >> /etc/profile && \
+    echo "export PYTHONPATH=${PYTHONPATH}:/hackoort" >> /etc/profile && \
+    true
+
 WORKDIR /hackoort
+CMD ["/usr/sbin/sshd", "-D", "-e"]
