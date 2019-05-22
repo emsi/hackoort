@@ -1,7 +1,6 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 
 from oortapi.app import api, bulb
-from oortapi.errors import BulbError
 
 
 @api.resource('/api/v1/status')

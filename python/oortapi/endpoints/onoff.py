@@ -6,7 +6,8 @@ from oortapi.app import api, bulb
 @api.resource('/api/v1/on')
 class On(Resource):
     def get(self):
-        bulb.on()
+        # set to BW first
+        bulb.bw().on()
         return 1
 
 
