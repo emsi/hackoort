@@ -19,7 +19,6 @@ class Bulb:
             seq=0, verbose=verbose, force=0, dry_run=0, password=password
         )
         self.connection = None
-        self.status = None
 
     def _check_connection(self):
         if self.connection is None:
@@ -42,12 +41,13 @@ class Bulb:
         return self
 
     def disconnect(self):
-        gattlib.gattlib_disconnect(self.connection)
+        if self.connection:
+            gattlib.gattlib_disconnect(self.connection)
+            self.connection = None
         return self
 
     def onoff(self, on):
         _checkzero(onoff(self.context, on))
-        self.status.on = on
         return self
 
     def on(self):
@@ -87,5 +87,8 @@ class Bulb:
         return self
 
     def get_status(self) -> BulbStatus:
-        self.status = get_characteristics(self.context)
-        return self.status
+        return get_characteristics(self.context)
+
+    @property
+    def status(self) -> BulbStatus:
+        return self.get_status()
