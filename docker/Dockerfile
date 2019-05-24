@@ -35,6 +35,8 @@ RUN cd /usr/local/src && \
     cp -al /usr/local/src/hackoort/python/hackoort /hackoort && \
     ldconfig
 
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade setuptools
 

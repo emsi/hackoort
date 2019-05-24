@@ -22,4 +22,5 @@ services:
     volumes:
       - ../python/hackoort:/hackoort/hackoort
       - ../python/oortapi:/hackoort/oortapi
+      - ../python/oorthap:/hackoort/oorthap
     network_mode: "host"
