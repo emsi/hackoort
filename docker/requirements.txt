@@ -2,3 +2,4 @@ argcomplete
 gunicorn
 flask
 flask_restful
+HAP-python

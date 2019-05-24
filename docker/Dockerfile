@@ -12,7 +12,9 @@ RUN apt-get install -y --no-install-recommends \
         ca-certificates \
         libbluetooth-dev libreadline-dev
 RUN apt-get install -y --no-install-recommends \
-    pkg-config libglib2.0-dev dbus bluez python3-pip python3-dev
+    pkg-config libglib2.0-dev dbus bluez python3-pip python3-dev \
+    libavahi-compat-libdnssd-dev
+
 
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* \
@@ -33,8 +35,12 @@ RUN cd /usr/local/src && \
     cp -al /usr/local/src/hackoort/python/hackoort /hackoort && \
     ldconfig
 
-RUN pip3 install --upgrade pip && \
-    pip install -r /usr/local/src/hackoort/python/requirements.txt
+RUN pip3 install --upgrade pip
+RUN pip3 install --upgrade setuptools
+
+COPY requirements.txt /hackoort
+
+RUN pip3 install -r /hackoort/requirements.txt
 
 # add ff unpriviledged user
 RUN groupadd -g 1000 hackoort && \
