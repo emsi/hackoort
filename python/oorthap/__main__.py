@@ -12,7 +12,7 @@ from pyhap.accessory import Bridge
 from pyhap.accessory_driver import AccessoryDriver
 
 from hackoort.bulb import Bulb
-from oorthap.bulb import OortBulb, OortColorBulb
+from oorthap.bulb import OortColorBulb, OortColorBulbSwitch
 
 logging.basicConfig(level=logging.INFO, format="[%(module)s] %(message)s")
 
@@ -22,9 +22,9 @@ def get_bridge(driver):
     bridge = Bridge(driver, 'pyBridge')
     bridge.set_info_service(manufacturer="Emsi")
 
-    bulb = Bulb('84:EB:18:7D:F8:61'.encode(), verbose=0).connect()
-    bridge.add_accessory(OortBulb(driver, 'Corner', bulb))
-    bridge.add_accessory(OortColorBulb(driver, 'Corner color', bulb))
+    bulb = Bulb('84:EB:18:7D:F8:61'.encode(), verbose=1).connect()
+    bridge.add_accessory(OortColorBulb(driver, 'Corner', bulb))
+    bridge.add_accessory(OortColorBulbSwitch(driver, 'Color switch', bulb))
     return bridge
 
 

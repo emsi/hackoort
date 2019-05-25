@@ -2,7 +2,7 @@ import colorsys
 import logging
 
 from pyhap.accessory import Accessory
-from pyhap.const import CATEGORY_LIGHTBULB
+from pyhap.const import CATEGORY_LIGHTBULB, CATEGORY_FAN
 
 from hackoort.bulb import Bulb
 
@@ -21,7 +21,7 @@ def hls2rgb(h, l, s):
 
 
 def rgb2hls(r, g, b):
-    """CPnvert r,g,b in 0-255 range to hls in 0.1
+    """Convert r,g,b in 0-255 range to hls in 0.1
 
     :param r: red
     :param g: green
@@ -31,7 +31,7 @@ def rgb2hls(r, g, b):
     return colorsys.rgb_to_hls(r/255.0, g/255.0, b/255.0)
 
 
-class OortBulb(Accessory):
+class OortColorBulb(Accessory):
 
     category = CATEGORY_LIGHTBULB
 
@@ -72,11 +72,10 @@ class OortBulb(Accessory):
         return self.status.on
 
     def set_on(self, value):
-        logging.info("Setting bulb: %s", value)
+        # logging.info("Setting bulb: %s", value)
         self.bulb.onoff(value)
-        if value and self.bulb.status.rgbon:
-            self.bulb.set_rgb_onoff(0)
-            print("RGB OFF")
+        # if value and self.bulb.status.rgbon:
+        #     self.bulb.set_rgb_onoff(0)
 
     def get_brightness(self):
         return self.status.brightness
@@ -88,9 +87,7 @@ class OortBulb(Accessory):
         :param value:
         :return:
         """
-        logging.info("Setting brightness value: %s", value)
-        self.status.brightness = value
-        # self.bulb.set_temperature_pct(value)
+        # logging.info("Setting brightness value: %s", value)
         self.bulb.set_brightness_pct(value)
 
     def set_hue(self, value):
@@ -110,49 +107,62 @@ class OortBulb(Accessory):
         :return:
         """
         self.saturation = value / 100.0
-        logging.info("Saturation: %s", value)
+        # logging.info("Saturation: %s", value)
 
     def stop(self):
         self.bulb.disconnect()
 
 
-class OortColorBulb(OortBulb):
-    def set_on(self, value):
-        # logging.info("Setting bulb: %s", value)
-        self.bulb.onoff(value)
-        if value and not self.bulb.status.rgbon:
-            print("RGB ON")
-            self.bulb.set_rgb_onoff(1)
+class OortColorBulbSwitch(Accessory):
+    category = CATEGORY_FAN
 
-    def set_brightness(self, value):
+    def __init__(self, driver, name, bulb: Bulb):
         """
-        The corresponding value is an integer representing a percentage
-        of the maximum brightness.
-        :param value:
-        :return:
-        """
-        logging.info("brightness value: %s", value)
-        self.status.brightness = value
-        self.bulb.set_brightness_pct(value)
 
-    def set_hue(self, value):
+        :param driver: pyhap driver
+        :param name: descriptive name
+        :param bulb: it has to be connected oort bulb
         """
-        The corresponding value is a floating point number in units
-        of arc degrees. Values range from 0 to 360, representing the color
-        spectrum starting from red, through yellow, green, cyan, blue,
-        and finally magenta, before wrapping back to red.
-        """
-        self.hue = value/360.0
-        self.bulb.set_rgb(*hls2rgb(self.hue, 0.5, self.saturation))
+        super().__init__(driver, name)
+        self.status = bulb.status
+        self.hue, _, self.saturation = rgb2hls(
+            self.status.red, self.status.green, self.status.blue)
 
-    def set_saturation(self, value):
-        """
-        The corresponding value is a percentage of maximum saturation.
-        :param value:
-        :return:
-        """
-        self.saturation = value / 100.0
-        logging.info("Saturation: %s", value)
+        serv_light = self.add_preload_service(
+            'Fan', chars=["On", "RotationDirection", "RotationSpeed"]
+        )
+        self.char_on = serv_light.configure_char(
+            'On', setter_callback=self.set_fake_on,
+            value=1, getter_callback=self.get_fake_on
+        )
 
-    def stop(self):
-        self.bulb.disconnect()
+        self.char_color_on = serv_light.configure_char(
+            'RotationDirection', setter_callback=self.set_color_on,
+            value=self.status.on,
+            getter_callback=self.get_color_on
+        )
+
+        self.char_temperature = serv_light.configure_char(
+            "RotationSpeed", setter_callback=self.set_temperature,
+            value=self.status.brightness, getter_callback=self.get_temperature
+        )
+
+        self.bulb = bulb
+
+    def get_fake_on(value):
+        return 1
+
+    def set_fake_on(self, value):
+        pass
+
+    def get_color_on(self):
+        return self.status.rgbon
+
+    def set_color_on(self, value):
+        self.bulb.set_rgb_onoff(value)
+
+    def get_temperature(self):
+        return self.status.temperature
+
+    def set_temperature(self, value):
+        self.bulb.set_temperature_pct(value)
