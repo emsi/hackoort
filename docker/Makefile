@@ -10,8 +10,11 @@ build:
 	docker build --force-rm --build-arg BASE=ubuntu:18.04 \
 	-t emsi/hackoort .
 
+.PHONY: pi
+pi: build-pi
+
 .PHONY: build-pi
-build-gpu:
+build-pi:
 	$(info Make: Building raspberry image.)
 	docker build --force-rm --build-arg BASE=raspbian/stretch \
 	-t emsi/hackoort:raspberry .
