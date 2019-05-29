@@ -50,6 +50,8 @@ RUN pip3 install -r /hackoort/requirements.txt
 RUN groupadd -g 1000 hackoort && \
     useradd -s /bin/bash -d /hackoort -u 1000 -g 1000 hackoort
 
+RUN mkdir /var/run/oorthap && chown hackoort:hackoort /var/run/oorthap
+
 # Set shell to bash
 ENV SHELL /bin/bash
 
