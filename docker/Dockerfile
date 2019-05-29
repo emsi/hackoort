@@ -1,6 +1,8 @@
-FROM ubuntu:16.04
+ARG BASE
+FROM $BASE
 
 RUN apt-get update
+RUN apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
         git \
         wget \
@@ -23,14 +25,14 @@ RUN apt-get clean && \
 RUN mkdir /hackoort
 
 RUN cd /usr/local/src && \
-    git clone https://github.com/labapart/gattlib.git && \
-    cd gattlib && git checkout initial-python-support && \
+    git clone https://github.com/emsi/gattlib.git && \
+    cd gattlib && git checkout docker && \
     mkdir build && cd build && \
     cmake .. && make && make install && \
     cp -al /usr/local/src/gattlib/gattlib-py/gattlib /hackoort
 RUN cd /usr/local/src && \
     git clone https://github.com/emsi/hackoort && \
-    cd hackoort && mkdir build && cd build && \
+    cd hackoort && git checkout HAP-python && mkdir build && cd build && \
     cmake .. && make && make install && \
     cp -al /usr/local/src/hackoort/python/hackoort /hackoort && \
     ldconfig
@@ -61,7 +63,7 @@ ENV PYTHONPATH="${PYTHONPATH}:/hackoort"
 
 # For development we use remote ssh
 RUN sed -i \
-    -e 's/^Port 22/Port 1122/' \
+    -e 's/^[#]*Port 22/Port 1122/' \
     /etc/ssh/sshd_config && \
 	mkdir /root/.ssh && chmod 700 /root/.ssh && mkdir /var/run/sshd
 COPY authorized_keys /root/.ssh

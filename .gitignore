@@ -10,6 +10,8 @@ CTestTestfile.cmake
 
 oorttool/oorttool
 
+!docker/Makefile
+
 *~
 
 # Byte-compiled / optimized / DLL files
