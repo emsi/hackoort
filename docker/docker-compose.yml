@@ -4,7 +4,7 @@ services:
   hackoort:
     hostname: hackoort
     container_name: hackoort
-    image: emsi/hackoort
+    image: emsi/hackoort${HACKOORT_TAG}
     build: .
     expose:
       - "22"
