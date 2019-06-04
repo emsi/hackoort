@@ -1,5 +1,10 @@
 PWD = $(shell pwd)
 HACKOORT_TAG = $(shell ./pi.sh)
+ifeq ($(HACKOORT_TAG),:raspberry)
+	BASE=raspbian/stretch
+else
+	BASE=ubuntu:18.04
+endif
 
 .PHONY: all
 all: build build-devel build-oorthap
@@ -8,7 +13,7 @@ all: build build-devel build-oorthap
 .PHONY: build
 build:
 	$(info Make: Building amd64 image.)
-	docker-compose build --force-rm --build-arg BASE=ubuntu:18.04 \
+	docker-compose build --force-rm --build-arg BASE=$(BASE) \
 	hackoort
 
 .PHONY: build-devel
@@ -33,19 +38,6 @@ clean:
 	-docker image rm emsi/hackoort-devel
 	-docker image rm emsi/oorthap
 	-docker image rm emsi/hackoort
-
-
-# raspberry targets
-
-.PHONY: pi
-pi: build-pi build-devel build-oorthap
-
-.PHONY: build-pi
-build-pi:
-	$(info Make: Building raspberry image.)
-	docker build --force-rm --build-arg BASE=raspbian/stretch \
-	-t emsi/hackoort:raspberry .
-
 
 # devel run/stop/enter targets
 
