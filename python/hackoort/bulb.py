@@ -1,3 +1,5 @@
+import logging
+
 from gattlib import gattlib
 from hackoort import (
     BulbStatus, HackoortContext, check_lock_status, get_characteristics, onoff,
@@ -5,11 +7,6 @@ from hackoort import (
     set_temperature_pct, unlock,
 )
 from hackoort.errors import OortException
-
-
-def _checkzero(zero):
-    if zero != 0:
-        raise OortException("Error comunicating with device")
 
 
 class Bulb:
@@ -20,15 +17,22 @@ class Bulb:
         )
         self.connection = None
 
+    def _checkzero(self, zero):
+        if zero != 0:
+            # try to reconnect
+            logging.warn("Attempting to reconnect.")
+            self.connect()
+            raise OortException("Error communicating with device")
+
     def _check_connection(self):
         if self.connection is None:
             raise OortException("Bulb is not connected")
 
     def connect(self):
-        conection = gattlib.gattlib_connect(None, self.bt_address, 1, 1, 0, 0)
-        if not conection:
+        connection = gattlib.gattlib_connect(None, self.bt_address, 1, 1, 0, 0)
+        if not connection:
             raise OortException("Cannot connect to BT device")
-        self.context.connection = self.connection = conection
+        self.context.connection = self.connection = connection
 
         # unlock with password
         if unlock(self.context) != 0:
@@ -42,12 +46,12 @@ class Bulb:
 
     def disconnect(self):
         if self.connection:
-            gattlib.gattlib_disconnect(self.connection)
             self.connection = None
+            gattlib.gattlib_disconnect(self.connection)
         return self
 
     def onoff(self, on):
-        _checkzero(onoff(self.context, on))
+        self._checkzero(onoff(self.context, on))
         return self
 
     def on(self):
@@ -63,27 +67,27 @@ class Bulb:
         return self.set_rgb_onoff(1)
 
     def set_brightness(self, brightness):
-        _checkzero(set_brightness(self.context, brightness))
+        self._checkzero(set_brightness(self.context, brightness))
         return self
 
     def set_brightness_pct(self, percent):
-        _checkzero(set_brightness_pct(self.context, percent))
+        self._checkzero(set_brightness_pct(self.context, percent))
         return self
 
     def set_temperature(self, temperature):
-        _checkzero(set_temperature(self.context, temperature))
+        self._checkzero(set_temperature(self.context, temperature))
         return self
 
     def set_temperature_pct(self, percent):
-        _checkzero(set_temperature_pct(self.context, percent))
+        self._checkzero(set_temperature_pct(self.context, percent))
         return self
 
     def set_rgb(self, red, green, blue):
-        _checkzero(set_rgb(self.context, red, green, blue))
+        self._checkzero(set_rgb(self.context, red, green, blue))
         return self
 
     def set_rgb_onoff(self, on):
-        _checkzero(set_rgb_onoff(self.context, on))
+        self._checkzero(set_rgb_onoff(self.context, on))
         return self
 
     def get_status(self) -> BulbStatus:
