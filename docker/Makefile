@@ -1,4 +1,5 @@
 PWD = $(shell pwd)
+HACKOORT_TAG = $(shell ./pi.sh)
 
 .PHONY: all
 all: build build-devel build-oorthap
@@ -7,20 +8,18 @@ all: build build-devel build-oorthap
 .PHONY: build
 build:
 	$(info Make: Building amd64 image.)
-	docker build --force-rm --build-arg BASE=ubuntu:18.04 \
-	-t emsi/hackoort$HACKOORT_TAG .
+	docker-compose build --force-rm --build-arg BASE=ubuntu:18.04 \
+	hackoort
 
 .PHONY: build-devel
 build-devel: build
 	$(info Make: Building amd64 devel image.)
-	docker build --force-rm  \
-	-t emsi/hackoort-devel$HACKOORT_TAG -f ./Dockerfile-devel .
+	docker-compose build --force-rm  hackoort-devel
 
 .PHONY: build-oorthap
 build-oorthap: build
 	$(info Make: Building amd64 devel image.)
-	docker build --force-rm  \
-	-t emsi/oorthap:$HACKOORT_TAG -f ./Dockerfile-oorthap .
+	docker-compose build --force-rm  oorthap
 
 
 .PHONT: oorthap
@@ -39,8 +38,7 @@ clean:
 # raspberry targets
 
 .PHONY: pi
-pi: build-pi
-	HACKOORT_TAG=:raspberry make build-devel build-oorthap
+pi: build-pi build-devel build-oorthap
 
 .PHONY: build-pi
 build-pi:

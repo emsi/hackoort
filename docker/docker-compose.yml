@@ -1,11 +1,19 @@
 version: '3.7'
 
 services:
+  hackoort:
+    image: emsi/hackoort${HACKOORT_TAG}
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
   hackoort-devel:
     hostname: hackoort-devel
     container_name: hackoort-devel
     image: emsi/hackoort-devel${HACKOORT_TAG}
-    build: Dockerfile-devel
+    build:
+      context: ./
+      dockerfile: Dockerfile-devel
     volumes:
       - ../python/hackoort:/hackoort/hackoort
       - ../python/oortapi:/hackoort/oortapi
@@ -17,7 +25,9 @@ services:
     hostname: oorthap
     container_name: oorthap
     image: emsi/oorthap${HACKOORT_TAG}
-    build: Dockerfile-oorthap
+    build:
+      context: ./
+      dockerfile: Dockerfile-oorthap
     volumes:
       - ./state:/etc/oort
     network_mode: "host"
