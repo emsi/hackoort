@@ -99,6 +99,7 @@ class OortColorBulb(Accessory):
         """
         self.hue = value/360.0
         self.bulb.set_rgb(*hls2rgb(self.hue, 0.5, self.saturation))
+        logging.info("Hue: %s", value)
 
     def set_saturation(self, value):
         """
@@ -107,7 +108,7 @@ class OortColorBulb(Accessory):
         :return:
         """
         self.saturation = value / 100.0
-        # logging.info("Saturation: %s", value)
+        logging.info("Saturation: %s", value)
 
     def stop(self):
         self.bulb.disconnect()

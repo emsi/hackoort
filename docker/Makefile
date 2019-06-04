@@ -8,19 +8,19 @@ all: build build-devel build-oorthap
 build:
 	$(info Make: Building amd64 image.)
 	docker build --force-rm --build-arg BASE=ubuntu:18.04 \
-	-t emsi/hackoort .
+	-t emsi/hackoort$HACKOORT_TAG .
 
 .PHONY: build-devel
 build-devel: build
 	$(info Make: Building amd64 devel image.)
-	docker build --force-rm --build-arg BASE=ubuntu:18.04 \
-	-t emsi/hackoort-devel -f ./Dockerfile-devel .
+	docker build --force-rm  \
+	-t emsi/hackoort-devel$HACKOORT_TAG -f ./Dockerfile-devel .
 
 .PHONY: build-oorthap
 build-oorthap: build
 	$(info Make: Building amd64 devel image.)
-	docker build --force-rm --build-arg BASE=ubuntu:18.04 \
-	-t emsi/oorthap -f ./Dockerfile-oorthap .
+	docker build --force-rm  \
+	-t emsi/oorthap:$HACKOORT_TAG -f ./Dockerfile-oorthap .
 
 
 .PHONT: oorthap
@@ -40,6 +40,7 @@ clean:
 
 .PHONY: pi
 pi: build-pi
+	HACKOORT_TAG=:raspberry make build-devel build-oorthap
 
 .PHONY: build-pi
 build-pi:
