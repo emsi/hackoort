@@ -24,7 +24,7 @@ RUN cd /usr/local/src && \
     cp -al /usr/local/src/gattlib/gattlib-py/gattlib /hackoort
 RUN cd /usr/local/src && \
     git clone https://github.com/emsi/hackoort && \
-    cd hackoort && git checkout HAP-python && mkdir build && cd build && \
+    cd hackoort && mkdir build && cd build && \
     cmake .. && make && make install && \
     cp -al /usr/local/src/hackoort/python/hackoort /hackoort && \
     cp -al /usr/local/src/hackoort/python/oorthap /hackoort && \
