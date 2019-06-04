@@ -1,0 +1,5 @@
+ARG HACKOORT_TAG
+FROM emsi/hackoort${HACKOORT_TAG}
+
+WORKDIR /
+CMD ["/usr/bin/python3", "-m", "oorthap"]

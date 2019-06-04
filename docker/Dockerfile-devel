@@ -1,0 +1,27 @@
+ARG HACKOORT_TAG
+FROM emsi/hackoort${HACKOORT_TAG}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        wget \
+        vim \
+        inetutils-ping net-tools \
+        openssh-server \
+        sudo \
+        ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# For development we use remote ssh
+RUN sed -i \
+    -e 's/^[#]*Port 22/Port 1122/' \
+    /etc/ssh/sshd_config && \
+	mkdir /root/.ssh && chmod 700 /root/.ssh && mkdir /var/run/sshd
+COPY authorized_keys /root/.ssh
+EXPOSE 22
+RUN echo "export LANG=C.UTF-8" >> /etc/profile &&\
+    echo "export LC_COLLATE=C.UTF-8" >> /etc/profile && \
+    echo "export PYTHONPATH=${PYTHONPATH}:/hackoort:/oorthap" >> /etc/profile && \
+    true
+
+WORKDIR /hackoort
+CMD ["/usr/sbin/sshd", "-D", "-e"]

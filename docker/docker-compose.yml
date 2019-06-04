@@ -1,27 +1,24 @@
 version: '3.7'
 
 services:
-  hackoort:
-    hostname: hackoort
-    container_name: hackoort
-    image: emsi/hackoort${HACKOORT_TAG}
-    build: .
-    expose:
-      - "22"
-      - "5011"
-    ports:
-    # ssh
-    - target: 22
-      published: 1122
-      protocol: tcp
-      mode: host
-    # flask
-    - target: 5011
-      published: 5011
-      protocol: tcp
+  hackoort-devel:
+    hostname: hackoort-devel
+    container_name: hackoort-devel
+    image: emsi/hackoort-devel${HACKOORT_TAG}
+    build: Dockerfile-devel
     volumes:
       - ../python/hackoort:/hackoort/hackoort
       - ../python/oortapi:/hackoort/oortapi
       - ../python/oorthap:/hackoort/oorthap
       - ./state:/etc/oort
     network_mode: "host"
+
+  oorthap:
+    hostname: oorthap
+    container_name: oorthap
+    image: emsi/oorthap${HACKOORT_TAG}
+    build: Dockerfile-oorthap
+    volumes:
+      - ./state:/etc/oort
+    network_mode: "host"
+    user: hackoort
