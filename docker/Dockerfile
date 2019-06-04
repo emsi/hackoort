@@ -44,9 +44,11 @@ FROM $BASE
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        bluez python3-pip python3-dev libavahi-compat-libdnssd-dev && \
+        bluez python3 libavahi-compat-libdnssd-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 COPY --from=base /usr/local/lib /usr/local/lib
 COPY --from=base /usr/local/bin /usr/local/bin
