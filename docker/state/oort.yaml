@@ -1,0 +1,11 @@
+version: '1.0'
+
+bridge_name: oorthap
+verbose: 1
+
+devices:
+  corner:
+    name: "Corner lamp"               # optional descriptive name
+    address: '84:EB:18:7D:F8:61'      # mandatory bt address
+    description: 'Room corner lamp'   # not used, just description
+    color_switch: yes   # if yes then fake FAN color switch is added

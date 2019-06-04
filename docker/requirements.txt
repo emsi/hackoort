@@ -1,5 +1,6 @@
 argcomplete
-gunicorn
 flask
 flask_restful
+gunicorn
 HAP-python
+ruamel.yaml

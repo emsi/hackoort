@@ -23,5 +23,5 @@ services:
       - ../python/hackoort:/hackoort/hackoort
       - ../python/oortapi:/hackoort/oortapi
       - ../python/oorthap:/hackoort/oorthap
-      - ./state:/var/run/oorthap
+      - ./state:/etc/oort
     network_mode: "host"
