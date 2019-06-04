@@ -1,8 +1,8 @@
 ARG BASE
-FROM $BASE
+FROM $BASE as base
 
 RUN apt-get update
-RUN apt-get upgrade -y
+#RUN apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
         git \
         build-essential cmake \
@@ -38,6 +38,20 @@ RUN pip3 install --upgrade setuptools
 COPY requirements.txt /hackoort
 
 RUN pip3 install -r /hackoort/requirements.txt
+
+ARG BASE
+FROM $BASE
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        bluez python3-pip python3-dev libavahi-compat-libdnssd-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=base /usr/local/lib /usr/local/lib
+COPY --from=base /usr/local/bin /usr/local/bin
+COPY --from=base /hackoort /hackoort
+RUN ldconfig
 
 # add ff unpriviledged user
 RUN groupadd -g 1000 hackoort && \
