@@ -14,6 +14,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile-devel
+      args:
+        HACKOORT_TAG: ${HACKOORT_TAG}
     volumes:
       - ../python/hackoort:/hackoort/hackoort
       - ../python/oortapi:/hackoort/oortapi
@@ -28,6 +30,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile-oorthap
+      args:
+        HACKOORT_TAG: ${HACKOORT_TAG}
     volumes:
       - ./state:/etc/oort
     network_mode: "host"
