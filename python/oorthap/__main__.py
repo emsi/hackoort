@@ -59,6 +59,8 @@ driver = AccessoryDriver(
 # Change `get_accessory` to `get_bridge` if you want to run a Bridge.
 driver.add_accessory(accessory=get_bridge(driver))
 
+logging.info("Pairing PIN: {}".format(driver.state.pincode.decode()))
+
 # We want SIGTERM (terminate) to be handled by the driver itself,
 # so that it can gracefully stop the accessory, server and advertising.
 signal.signal(signal.SIGTERM, driver.signal_handler)
