@@ -1,10 +1,6 @@
 PWD = $(shell pwd)
 HACKOORT_TAG = $(shell ./pi.sh)
-ifeq ($(HACKOORT_TAG),:raspberry)
-	BASE=raspbian/stretch
-else
-	BASE=ubuntu:18.04
-endif
+BASE=ubuntu:18.04
 
 .PHONY: all
 all: build build-devel build-oorthap
@@ -12,25 +8,25 @@ all: build build-devel build-oorthap
 
 .PHONY: build
 build:
-	$(info Make: Building amd64 image.)
-	docker-compose build --force-rm --build-arg BASE=$(BASE) \
-	hackoort
+	$(info Make: Building hackoort${HACKOORT_TAG} image.)
+	HACKOORT_TAG=${HACKOORT_TAG} docker-compose build \
+		--force-rm --build-arg BASE=$(BASE) hackoort
 
 .PHONY: build-devel
 build-devel: build
-	$(info Make: Building amd64 devel image.)
-	docker-compose build --force-rm  hackoort-devel
+	$(info Make: Building hackoort-devel{HACKOORT_TAG} image.)
+	HACKOORT_TAG=${HACKOORT_TAG}  docker-compose build --force-rm  hackoort-devel
 
 .PHONY: build-oorthap
 build-oorthap: build
-	$(info Make: Building amd64 devel image.)
-	docker-compose build --force-rm  oorthap
+	$(info Make: Building oorthap${HACKOORT_TAG} image.)
+	HACKOORT_TAG=${HACKOORT_TAG} docker-compose build --force-rm  oorthap
 
 
 .PHONT: oorthap
 oorthap: build-oorthap
 	$(info Make: Starting containers.)
-	docker-compose up -d oorthap
+	HACKOORT_TAG=${HACKOORT_TAG} docker-compose up -d oorthap
 
 
 clean:
@@ -44,7 +40,7 @@ clean:
 .PHONY: devel
 devel: build-devel
 	$(info Make: Starting containers.)
-	docker-compose up -d hackoort-devel
+	HACKOORT_TAG=${HACKOORT_TAG} docker-compose up -d hackoort-devel
 
 .PHONY: stop-devel
 stop-devel:
@@ -59,5 +55,5 @@ restart-devel:
 
 .PHONY:enter
 enter:
-	docker-compose exec hackoort-devel /bin/bash
+	HACKOORT_TAG=${HACKOORT_TAG}  docker-compose exec hackoort-devel /bin/bash
 
